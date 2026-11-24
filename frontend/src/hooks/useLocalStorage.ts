@@ -1,0 +1,34 @@
+import { useState } from "react";
+
+export const useLocalStorage = (keyName: string, defaultValue: string): [string, (value: string) => void] => {
+  const [storedValue, setStoredValue] = useState(() => {
+    try {
+      // try to get the value
+      const value = window.localStorage.getItem(keyName);
+      if (value) {
+        return value;
+      } else {
+        window.localStorage.setItem(keyName, defaultValue);
+        return defaultValue;
+      }
+    } catch {
+      return defaultValue;
+    }
+  });
+
+  const setValue = (newValue: string) => {
+    try {
+      // Si nos pasan un valor vacío (logout), quitamos la clave del todo
+      if (newValue) {
+        window.localStorage.setItem(keyName, newValue);
+      } else {
+        window.localStorage.removeItem(keyName);
+      }
+    } catch (err) {
+      console.log(err);
+    }
+    setStoredValue(newValue);
+  };
+
+  return [storedValue, setValue];
+};
